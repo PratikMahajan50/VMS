@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>GStreamer Test Pattern Viewer</title>
+    <style>
+        body { margin: 0; background: #000; color: #fff; font-family: Arial; }
+        .container { display: flex; flex-direction: column; height: 100vh; }
+        .header { background: #333; padding: 1rem; text-align: center; }
+        .video-container { flex: 1; display: flex; justify-content: center; align-items: center; position: relative; }
+        .video-player { max-width: 100%; max-height: 100%; border: 2px solid #555; }
+        .controls { background: #333; padding: 1rem; text-align: center; }
+        .btn { background: #007bff; color: white; border: none; padding: 0.5rem 1rem; margin: 0 0.5rem; cursor: pointer; border-radius: 4px; }
+        .btn:hover { background: #0056b3; }
+        .status { margin: 1rem 0; }
+        .error { color: #ff6b6b; }
+        .success { color: #51cf66; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Stream 1 - Live View</h1>
+            <p>UDP Port: 8081 | Resolution: 1920x1080 @ 30fps | Codec: H.264</p>
+        </div>
+        <div class="video-container">
+            <canvas id="videoCanvas" class="video-player" width="640" height="360"></canvas>
+            <div id="status" class="status">Stream 1 - GStreamer Test Pattern</div>
+        </div>
+        <div class="controls">
+            <button class="btn" onclick="refreshStream()">Refresh Stream</button>
+            <button class="btn" onclick="toggleFullscreen()">Fullscreen</button>
+            <button class="btn" onclick="window.close()">Close</button>
+        </div>
+    </div>
+    
+    <script>
+        const canvas = document.getElementById('videoCanvas');
+        const ctx = canvas.getContext('2d');
+        const status = document.getElementById('status');
+        const streamId = 0;
+        let animationId;
+        let time = 0;
+
+        function updateStatus(message, type = 'info') {
+            status.textContent = message;
+            status.className = 'status ' + type;
+        }
+
+        function drawTestPattern() {
+            const width = canvas.width;
+            const height = canvas.height;
+            
+            // Clear canvas
+            ctx.fillStyle = '#000';
+            ctx.fillRect(0, 0, width, height);
+            
+            // Draw SMPTE color bars (pattern 2 from videotestsrc)
+            const barWidth = width / 7;
+            const colors = ['#C0C0C0', '#C0C000', '#00C0C0', '#00C000', '#C000C0', '#C00000', '#0000C0'];
+            
+            for (let i = 0; i < 7; i++) {
+                ctx.fillStyle = colors[i];
+                ctx.fillRect(i * barWidth, 0, barWidth, height * 0.6);
+            }
+            
+            // Draw moving elements
+            const centerX = width / 2;
+            const centerY = height / 2;
+            
+            // Moving circle
+            const circleX = centerX + Math.sin(time * 0.02) * 100;
+            const circleY = centerY + Math.cos(time * 0.02) * 50;
+            ctx.fillStyle = '#FF0000';
+            ctx.beginPath();
+            ctx.arc(circleX, circleY, 20, 0, Math.PI * 2);
+            ctx.fill();
+            
+            // Moving rectangle
+            const rectX = centerX + Math.cos(time * 0.015) * 80;
+            const rectY = centerY + Math.sin(time * 0.015) * 40;
+            ctx.fillStyle = '#00FF00';
+            ctx.fillRect(rectX - 15, rectY - 15, 30, 30);
+            
+            // Moving triangle
+            const triX = centerX + Math.sin(time * 0.025) * 60;
+            const triY = centerY + Math.cos(time * 0.025) * 30;
+            ctx.fillStyle = '#0000FF';
+            ctx.beginPath();
+            ctx.moveTo(triX, triY - 15);
+            ctx.lineTo(triX - 15, triY + 15);
+            ctx.lineTo(triX + 15, triY + 15);
+            ctx.closePath();
+            ctx.fill();
+            
+            // Draw text overlay
+            ctx.fillStyle = '#FFFFFF';
+            ctx.font = '16px Arial';
+            ctx.textAlign = 'center';
+            ctx.fillText('GStreamer Test Pattern - Stream ' + (streamId + 1), centerX, height - 20);
+            ctx.fillText('Time: ' + Math.floor(time / 60) + 's', centerX, height - 40);
+            
+            time++;
+        }
+
+        function animate() {
+            drawTestPattern();
+            animationId = requestAnimationFrame(animate);
+        }
+
+        function refreshStream() {
+            updateStatus('Refreshing stream...', 'info');
+            if (animationId) {
+                cancelAnimationFrame(animationId);
+            }
+            time = 0;
+            animate();
+            updateStatus('Stream ' + (streamId + 1) + ' - GStreamer Test Pattern (Simulated)', 'success');
+        }
+
+        function toggleFullscreen() {
+            if (canvas.requestFullscreen) {
+                canvas.requestFullscreen();
+            } else if (canvas.webkitRequestFullscreen) {
+                canvas.webkitRequestFullscreen();
+            } else if (canvas.msRequestFullscreen) {
+                canvas.msRequestFullscreen();
+            }
+        }
+
+        // Start the animation
+        updateStatus('Starting stream...', 'info');
+        setTimeout(() => {
+            refreshStream();
+        }, 500);
+
+        // Cleanup on page unload
+        window.addEventListener('beforeunload', () => {
+            if (animationId) {
+                cancelAnimationFrame(animationId);
+            }
+        });
+    </script>
+</body>
+</html>

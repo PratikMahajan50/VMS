@@ -41,9 +41,10 @@ bool GStreamerPipeline::initialize() {
         return false;
     }
     
-    // Configure source
+    // Configure source - use pattern 2 for moving test pattern
+    // Available patterns: 0=solid color, 1=smpte, 2=color bars, 3=ball, 4=smpte75, 5=zone plate, 6=gamut, 7=chroma zone plate, 8=solid color, 9=black, 10=white, 11=red, 12=green, 13=blue, 14=checkers-1, 15=checkers-2, 16=checkers-4, 17=checkers-8, 18=circular, 19=blink, 20=smpte100, 21=bar, 22=pinwheel, 23=spokes, 24=gradient, 25=colors
     g_object_set(m_source,
-                 "pattern", 0,
+                 "pattern", 2,  // 2 = SMPTE color bars with moving elements
                  "is-live", TRUE,
                  NULL);
     
@@ -63,9 +64,9 @@ bool GStreamerPipeline::initialize() {
                  "config-interval", 1,
                  NULL);
     
-    // Configure UDP sink to server IP
+    // Configure UDP sink to localhost
     g_object_set(m_udpsink,
-                 "host", "172.30.41.111",
+                 "host", "127.0.0.1",
                  "port", m_port,
                  "sync", FALSE,
                  NULL);
@@ -139,8 +140,15 @@ void GStreamerPipeline::stop() {
 
 std::string GStreamerPipeline::getStreamUrl() {
     std::ostringstream url;
-    url << "udp://172.30.41.111:" << m_port;
+    url << "udp://127.0.0.1:" << m_port;
     return url.str();
+}
+
+void GStreamerPipeline::setTestPattern(int pattern) {
+    if (m_source) {
+        g_object_set(m_source, "pattern", pattern, NULL);
+        std::cout << "Changed test pattern to " << pattern << " for stream " << m_streamId << std::endl;
+    }
 }
 
 void GStreamerPipeline::busWatch() {

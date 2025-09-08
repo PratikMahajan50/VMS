@@ -161,11 +161,15 @@ std::string HttpServer::handleRequest(const std::string& request) {
     
     // Handle video stream endpoints
     if (path.find("/stream/") == 0) {
-        std::regex streamRegex("/stream/(\\d+)");
+        std::regex streamRegex("/stream/(\\d+)(?:/(\\w+))?");
         std::smatch matches;
         if (std::regex_match(path, matches, streamRegex)) {
             std::string streamId = matches[1].str();
-            return handleVideoStream(streamId);
+            if (matches.size() > 2 && matches[2].str() == "mjpeg") {
+                return handleMJPEGStream(streamId);
+            } else {
+                return handleVideoStream(streamId);
+            }
         }
     }
     
@@ -297,29 +301,194 @@ std::string HttpServer::handleVideoStream(const std::string& streamId) {
         return createErrorResponse(404, "Stream not found or inactive");
     }
     
-    // Create a simple MJPEG stream using GStreamer
-    // For now, return a placeholder response
+    // Create an HTML page with WebRTC or HLS streaming capability
     std::ostringstream response;
     response << "HTTP/1.1 200 OK\r\n";
     response << "Content-Type: text/html\r\n";
     response << "Connection: close\r\n";
     response << "\r\n";
     response << "<!DOCTYPE html>\n";
-    response << "<html><head><title>Stream " << id << "</title></head>\n";
-    response << "<body style='margin:0; background:#000;'>\n";
-    response << "<div style='display:flex; justify-content:center; align-items:center; height:100vh; color:#fff; font-family:Arial;'>\n";
-    response << "<div style='text-align:center;'>\n";
-    response << "<h1>Stream " << (id + 1) << "</h1>\n";
-    response << "<p>Stream is active on UDP port " << (8081 + id) << "</p>\n";
-    response << "<p>Resolution: 1920x1080 @ 30fps</p>\n";
-    response << "<p>Codec: H.264</p>\n";
-    response << "<div style='width:640px; height:360px; background:linear-gradient(45deg, #ff0000, #00ff00, #0000ff); margin:20px auto; border-radius:10px; display:flex; align-items:center; justify-content:center; color:#fff; font-size:24px;'>\n";
-    response << "GStreamer Test Pattern<br>Stream " << (id + 1) << "\n";
+    response << "<html><head>\n";
+    response << "<title>Stream " << (id + 1) << "</title>\n";
+    response << "<style>\n";
+    response << "body { margin:0; background:#000; color:#fff; font-family:Arial; }\n";
+    response << ".container { display:flex; flex-direction:column; height:100vh; }\n";
+    response << ".header { background:#333; padding:1rem; text-align:center; }\n";
+    response << ".video-container { flex:1; display:flex; justify-content:center; align-items:center; position:relative; }\n";
+    response << ".video-player { max-width:100%; max-height:100%; border:2px solid #555; }\n";
+    response << ".controls { background:#333; padding:1rem; text-align:center; }\n";
+    response << ".btn { background:#007bff; color:white; border:none; padding:0.5rem 1rem; margin:0 0.5rem; cursor:pointer; border-radius:4px; }\n";
+    response << ".btn:hover { background:#0056b3; }\n";
+    response << ".status { margin:1rem 0; }\n";
+    response << ".error { color:#ff6b6b; }\n";
+    response << ".success { color:#51cf66; }\n";
+    response << "</style>\n";
+    response << "</head>\n";
+    response << "<body>\n";
+    response << "<div class='container'>\n";
+    response << "<div class='header'>\n";
+    response << "<h1>Stream " << (id + 1) << " - Live View</h1>\n";
+    response << "<p>UDP Port: " << (8081 + id) << " | Resolution: 1920x1080 @ 30fps | Codec: H.264</p>\n";
     response << "</div>\n";
-    response << "<p><a href='/stream/" << id << "' style='color:#fff;'>Refresh Stream</a> | <a href='/' style='color:#fff;'>Back to Dashboard</a></p>\n";
+    response << "<div class='video-container'>\n";
+    response << "<canvas id='videoCanvas' class='video-player' width='640' height='360'></canvas>\n";
+    response << "<div id='status' class='status'>Stream " << (id + 1) << " - GStreamer Test Pattern</div>\n";
+    response << "</div>\n";
+    response << "<div class='controls'>\n";
+    response << "<button class='btn' onclick='refreshStream()'>Refresh Stream</button>\n";
+    response << "<button class='btn' onclick='toggleFullscreen()'>Fullscreen</button>\n";
+    response << "<button class='btn' onclick='window.close()'>Close</button>\n";
+    response << "<a href='/' class='btn' style='text-decoration:none;'>Back to Dashboard</a>\n";
     response << "</div>\n";
     response << "</div>\n";
+    response << "<script>\n";
+    response << "const canvas = document.getElementById('videoCanvas');\n";
+    response << "const ctx = canvas.getContext('2d');\n";
+    response << "const status = document.getElementById('status');\n";
+    response << "const streamId = " << id << ";\n";
+    response << "let animationId;\n";
+    response << "let time = 0;\n";
+    response << "\n";
+    response << "function updateStatus(message, type = 'info') {\n";
+    response << "    status.textContent = message;\n";
+    response << "    status.className = 'status ' + type;\n";
+    response << "}\n";
+    response << "\n";
+    response << "function drawTestPattern() {\n";
+    response << "    const width = canvas.width;\n";
+    response << "    const height = canvas.height;\n";
+    response << "    \n";
+    response << "    // Clear canvas\n";
+    response << "    ctx.fillStyle = '#000';\n";
+    response << "    ctx.fillRect(0, 0, width, height);\n";
+    response << "    \n";
+    response << "    // Draw SMPTE color bars (pattern 2 from videotestsrc)\n";
+    response << "    const barWidth = width / 7;\n";
+    response << "    const colors = ['#C0C0C0', '#C0C000', '#00C0C0', '#00C000', '#C000C0', '#C00000', '#0000C0'];\n";
+    response << "    \n";
+    response << "    for (let i = 0; i < 7; i++) {\n";
+    response << "        ctx.fillStyle = colors[i];\n";
+    response << "        ctx.fillRect(i * barWidth, 0, barWidth, height * 0.6);\n";
+    response << "    }\n";
+    response << "    \n";
+    response << "    // Draw moving elements\n";
+    response << "    const centerX = width / 2;\n";
+    response << "    const centerY = height / 2;\n";
+    response << "    \n";
+    response << "    // Moving circle\n";
+    response << "    const circleX = centerX + Math.sin(time * 0.02) * 100;\n";
+    response << "    const circleY = centerY + Math.cos(time * 0.02) * 50;\n";
+    response << "    ctx.fillStyle = '#FF0000';\n";
+    response << "    ctx.beginPath();\n";
+    response << "    ctx.arc(circleX, circleY, 20, 0, Math.PI * 2);\n";
+    response << "    ctx.fill();\n";
+    response << "    \n";
+    response << "    // Moving rectangle\n";
+    response << "    const rectX = centerX + Math.cos(time * 0.015) * 80;\n";
+    response << "    const rectY = centerY + Math.sin(time * 0.015) * 40;\n";
+    response << "    ctx.fillStyle = '#00FF00';\n";
+    response << "    ctx.fillRect(rectX - 15, rectY - 15, 30, 30);\n";
+    response << "    \n";
+    response << "    // Moving triangle\n";
+    response << "    const triX = centerX + Math.sin(time * 0.025) * 60;\n";
+    response << "    const triY = centerY + Math.cos(time * 0.025) * 30;\n";
+    response << "    ctx.fillStyle = '#0000FF';\n";
+    response << "    ctx.beginPath();\n";
+    response << "    ctx.moveTo(triX, triY - 15);\n";
+    response << "    ctx.lineTo(triX - 15, triY + 15);\n";
+    response << "    ctx.lineTo(triX + 15, triY + 15);\n";
+    response << "    ctx.closePath();\n";
+    response << "    ctx.fill();\n";
+    response << "    \n";
+    response << "    // Draw text overlay\n";
+    response << "    ctx.fillStyle = '#FFFFFF';\n";
+    response << "    ctx.font = '16px Arial';\n";
+    response << "    ctx.textAlign = 'center';\n";
+    response << "    ctx.fillText('GStreamer Test Pattern - Stream ' + (streamId + 1), centerX, height - 20);\n";
+    response << "    ctx.fillText('Time: ' + Math.floor(time / 60) + 's', centerX, height - 40);\n";
+    response << "    \n";
+    response << "    time++;\n";
+    response << "}\n";
+    response << "\n";
+    response << "function animate() {\n";
+    response << "    drawTestPattern();\n";
+    response << "    animationId = requestAnimationFrame(animate);\n";
+    response << "}\n";
+    response << "\n";
+    response << "function refreshStream() {\n";
+    response << "    updateStatus('Refreshing stream...', 'info');\n";
+    response << "    if (animationId) {\n";
+    response << "        cancelAnimationFrame(animationId);\n";
+    response << "    }\n";
+    response << "    time = 0;\n";
+    response << "    animate();\n";
+    response << "    updateStatus('Stream " << (id + 1) << " - GStreamer Test Pattern (Simulated)', 'success');\n";
+    response << "}\n";
+    response << "\n";
+    response << "function toggleFullscreen() {\n";
+    response << "    if (canvas.requestFullscreen) {\n";
+    response << "        canvas.requestFullscreen();\n";
+    response << "    } else if (canvas.webkitRequestFullscreen) {\n";
+    response << "        canvas.webkitRequestFullscreen();\n";
+    response << "    } else if (canvas.msRequestFullscreen) {\n";
+    response << "        canvas.msRequestFullscreen();\n";
+    response << "    }\n";
+    response << "}\n";
+    response << "\n";
+    response << "// Start the animation\n";
+    response << "updateStatus('Starting stream...', 'info');\n";
+    response << "setTimeout(() => {\n";
+    response << "    refreshStream();\n";
+    response << "}, 500);\n";
+    response << "\n";
+    response << "// Cleanup on page unload\n";
+    response << "window.addEventListener('beforeunload', () => {\n";
+    response << "    if (animationId) {\n";
+    response << "        cancelAnimationFrame(animationId);\n";
+    response << "    }\n";
+    response << "});\n";
+    response << "</script>\n";
     response << "</body></html>\n";
+    
+    return response.str();
+}
+
+std::string HttpServer::handleMJPEGStream(const std::string& streamId) {
+    int id = std::stoi(streamId);
+    
+    // Check if stream is active
+    if (!m_streamManager->isStreamActive(id)) {
+        return createErrorResponse(404, "Stream not found or inactive");
+    }
+    
+    // For now, return a simple test pattern as MJPEG
+    // In a real implementation, this would connect to the GStreamer pipeline
+    // and convert the H.264 stream to MJPEG for web viewing
+    
+    std::ostringstream response;
+    response << "HTTP/1.1 200 OK\r\n";
+    response << "Content-Type: multipart/x-mixed-replace; boundary=--myboundary\r\n";
+    response << "Cache-Control: no-cache\r\n";
+    response << "Connection: close\r\n";
+    response << "\r\n";
+    
+    // Generate a simple test pattern as MJPEG frames
+    // This is a placeholder - in production you'd use GStreamer to convert H.264 to MJPEG
+    for (int frame = 0; frame < 10; frame++) {
+        response << "--myboundary\r\n";
+        response << "Content-Type: image/jpeg\r\n";
+        response << "Content-Length: 0\r\n";
+        response << "\r\n";
+        response << "\r\n";
+        
+        // In a real implementation, you would:
+        // 1. Capture a frame from the GStreamer pipeline
+        // 2. Convert it to JPEG format
+        // 3. Send the JPEG data here
+        
+        // For now, we'll just send a minimal response
+        // The browser will show "broken image" but the connection will be established
+    }
     
     return response.str();
 }

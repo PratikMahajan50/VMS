@@ -1,0 +1,7 @@
+/workspace/VMS/build/CMakeFiles/vms.dir
+/workspace/VMS/build/CMakeFiles/edit_cache.dir
+/workspace/VMS/build/CMakeFiles/rebuild_cache.dir
+/workspace/VMS/build/CMakeFiles/list_install_components.dir
+/workspace/VMS/build/CMakeFiles/install.dir
+/workspace/VMS/build/CMakeFiles/install/local.dir
+/workspace/VMS/build/CMakeFiles/install/strip.dir

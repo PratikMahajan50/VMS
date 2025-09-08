@@ -30,7 +30,7 @@ int main() {
         g_streamManager = std::make_unique<StreamManager>();
         
         // Initialize HTTP server for Ubuntu deployment
-        std::string host = "172.30.41.111";  // Bind to device IP
+        std::string host = "0.0.0.0";  // Bind to all interfaces
         int port = 8080;
         
         g_server = std::make_unique<HttpServer>(host, port, g_streamManager.get());
