@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Seagate Video Management System</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <div class="header-content">
+                <div class="logo-section">
+                    <div class="logo">
+                        <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <rect width="32" height="32" rx="4" fill="#0066CC"/>
+                            <path d="M8 12h16v8H8z" fill="white"/>
+                            <path d="M10 14h12v4H10z" fill="#0066CC"/>
+                        </svg>
+                        <span class="logo-text">Seagate VMS</span>
+                    </div>
+                    <h1>Video Management System</h1>
+                </div>
+                <div class="header-controls">
+                    <div class="control-group">
+                        <button id="startAllBtn" class="btn btn-primary">
+                            <i class="fas fa-play"></i> Start All Streams
+                        </button>
+                        <button id="stopAllBtn" class="btn btn-secondary">
+                            <i class="fas fa-stop"></i> Stop All
+                        </button>
+                    </div>
+                    <div class="status-indicator">
+                        <span id="connectionStatus" class="status-dot offline"></span>
+                        <span id="connectionText">Disconnected</span>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <main class="main-content">
+            <div class="streams-grid" id="streamsGrid">
+                <!-- Stream cards will be dynamically generated -->
+            </div>
+        </main>
+
+        <footer class="footer">
+            <div class="footer-content">
+                <div class="footer-left">
+                    <p>&copy; 2024 Seagate Technology LLC. All rights reserved.</p>
+                    <p>Video Management System - Enterprise Edition</p>
+                </div>
+                <div class="system-info">
+                    <div class="info-item">
+                        <span class="info-label">Server:</span>
+                        <span id="serverInfo">localhost:8080</span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Active Streams:</span>
+                        <span id="activeStreams">0</span>/8
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Status:</span>
+                        <span class="status-text">Operational</span>
+                    </div>
+                </div>
+            </div>
+        </footer>
+    </div>
+
+    <!-- Stream Modal -->
+    <div id="streamModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 id="modalTitle">Stream Details</h2>
+                <span class="close">&times;</span>
+            </div>
+            <div class="modal-body">
+                <div class="stream-details">
+                    <div class="detail-item">
+                        <label>Stream ID:</label>
+                        <span id="modalStreamId">-</span>
+                    </div>
+                    <div class="detail-item">
+                        <label>Status:</label>
+                        <span id="modalStatus" class="status-badge">-</span>
+                    </div>
+                    <div class="detail-item">
+                        <label>Resolution:</label>
+                        <span id="modalResolution">1920x1080</span>
+                    </div>
+                    <div class="detail-item">
+                        <label>Frame Rate:</label>
+                        <span id="modalFrameRate">30 FPS</span>
+                    </div>
+                    <div class="detail-item">
+                        <label>Stream URL:</label>
+                        <input type="text" id="modalStreamUrl" readonly>
+                    </div>
+                </div>
+                <div class="modal-actions">
+                    <button id="modalStartBtn" class="btn btn-success">
+                        <i class="fas fa-play"></i> Start Stream
+                    </button>
+                    <button id="modalStopBtn" class="btn btn-danger">
+                        <i class="fas fa-stop"></i> Stop Stream
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
