@@ -14,6 +14,7 @@ public:
     bool initialize();
     void stop();
     std::string getStreamUrl();
+    void setTestPattern(int pattern);
     
 private:
     int m_streamId;

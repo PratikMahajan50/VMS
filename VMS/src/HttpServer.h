@@ -42,4 +42,5 @@ private:
     
     // Video stream endpoints
     std::string handleVideoStream(const std::string& streamId);
+    std::string handleMJPEGStream(const std::string& streamId);
 };

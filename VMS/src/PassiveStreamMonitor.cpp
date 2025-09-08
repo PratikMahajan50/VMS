@@ -7,8 +7,8 @@
 #include <iostream>
 
 PassiveStreamMonitor::PassiveStreamMonitor(int streamId, int port)
-    : m_streamId(streamId), m_port(port), m_socketFd(-1) {
-    m_lastActivity.store(std::chrono::steady_clock::now());
+    : m_streamId(streamId), m_port(port), m_socketFd(-1), 
+      m_lastActivity(std::chrono::steady_clock::now()) {
 }
 
 PassiveStreamMonitor::~PassiveStreamMonitor() {
