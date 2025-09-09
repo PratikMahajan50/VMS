@@ -1,21 +1,17 @@
 /* Video Management System Styles */
 
-/* CSS Variables for VMS Brand Colors */
+/* CSS Variables for Seagate-inspired green/black/gray palette */
 :root {
-    --vms-blue: #0066CC;
-    --vms-blue-dark: #004499;
-    --vms-blue-light: #3388DD;
-    --vms-gray: #6B7280;
-    --vms-gray-light: #F3F4F6;
-    --vms-gray-dark: #374151;
-    --vms-success: #10B981;
-    --vms-warning: #F59E0B;
-    --vms-error: #EF4444;
-    --vms-white: #FFFFFF;
-    --vms-black: #111827;
-    --vms-border: #E5E7EB;
-    --vms-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
-    --vms-shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    --vms-green: #00e676; /* seagate green */
+    --vms-green-dark: #00b34c;
+    --vms-black: #000000;
+    --vms-gray: #808080; /* gray */
+    --vms-gray-dark: #1f1f1f; /* dark gray */
+    --vms-gray-mid: #2a2a2a;
+    --vms-white: #ffffff;
+    --vms-border: #2e2e2e;
+    --vms-shadow: 0 2px 8px rgba(0,0,0,0.4);
+    --vms-shadow-lg: 0 8px 24px rgba(0,0,0,0.6);
 }
 
 /* Reset and base styles */
@@ -27,9 +23,9 @@
 
 body {
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-    background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+    background: var(--vms-black);
     min-height: 100vh;
-    color: var(--vms-gray-dark);
+    color: var(--vms-white);
     line-height: 1.6;
 }
 
@@ -39,19 +35,17 @@ body {
     min-height: 100vh;
     display: flex;
     flex-direction: column;
-    background: var(--vms-white);
-    box-shadow: var(--vms-shadow-lg);
+    background: var(--vms-black);
 }
 
 /* Header */
 .header {
-    background: var(--vms-white);
+    background: var(--vms-gray-dark);
     border-bottom: 1px solid var(--vms-border);
     padding: 1rem 0;
     position: sticky;
     top: 0;
     z-index: 100;
-    backdrop-filter: blur(10px);
 }
 
 .header-content {
@@ -78,11 +72,11 @@ body {
 .logo-text {
     font-weight: 700;
     font-size: 1.2rem;
-    color: var(--vms-blue);
+    color: var(--vms-green);
 }
 
 .header h1 {
-    color: var(--vms-gray-dark);
+    color: var(--vms-white);
     font-size: 1.5rem;
     font-weight: 600;
     margin: 0;
@@ -115,13 +109,13 @@ body {
 }
 
 .status-dot.online {
-    background-color: var(--vms-success);
-    box-shadow: 0 0 0 2px rgba(16, 185, 129, 0.2);
+    background-color: var(--vms-green);
+    box-shadow: 0 0 0 2px rgba(0, 230, 118, 0.2);
 }
 
 .status-dot.offline {
-    background-color: var(--vms-error);
-    box-shadow: 0 0 0 2px rgba(239, 68, 68, 0.2);
+    background-color: var(--vms-gray);
+    box-shadow: 0 0 0 2px rgba(128, 128, 128, 0.2);
 }
 
 /* Buttons */
@@ -150,17 +144,17 @@ body {
 }
 
 .btn-primary {
-    background: var(--vms-blue);
-    color: var(--vms-white);
+    background: var(--vms-green);
+    color: var(--vms-black);
 }
 
 .btn-primary:hover {
-    background: var(--vms-blue-dark);
+    background: var(--vms-green-dark);
 }
 
 .btn-secondary {
-    background: var(--vms-gray-light);
-    color: var(--vms-gray-dark);
+    background: var(--vms-gray-mid);
+    color: var(--vms-white);
     border: 1px solid var(--vms-border);
 }
 
@@ -170,8 +164,8 @@ body {
 }
 
 .btn-success {
-    background: var(--vms-success);
-    color: var(--vms-white);
+    background: var(--vms-green);
+    color: var(--vms-black);
 }
 
 .btn-success:hover {
@@ -179,8 +173,8 @@ body {
 }
 
 .btn-danger {
-    background: var(--vms-error);
-    color: var(--vms-white);
+    background: var(--vms-gray);
+    color: var(--vms-black);
 }
 
 .btn-danger:hover {
@@ -191,12 +185,12 @@ body {
 .main-content {
     flex: 1;
     padding: 2rem;
-    background: var(--vms-gray-light);
+    background: var(--vms-black);
 }
 
 .streams-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
     gap: 1.5rem;
     max-width: 1200px;
     margin: 0 auto;
@@ -204,9 +198,9 @@ body {
 
 /* Stream cards */
 .stream-card {
-    background: var(--vms-white);
-    border-radius: 12px;
-    padding: 1.5rem;
+    background: var(--vms-gray-dark);
+    border-radius: 8px;
+    padding: 1rem;
     box-shadow: var(--vms-shadow);
     transition: all 0.3s ease;
     border: 1px solid var(--vms-border);
@@ -217,7 +211,7 @@ body {
 .stream-card:hover {
     transform: translateY(-2px);
     box-shadow: var(--vms-shadow-lg);
-    border-color: var(--vms-blue-light);
+    border-color: var(--vms-green);
 }
 
 .stream-card::before {
@@ -232,7 +226,7 @@ body {
 }
 
 .stream-card.active::before {
-    background: var(--vms-success);
+    background: var(--vms-green);
 }
 
 .stream-header {
@@ -245,7 +239,7 @@ body {
 .stream-title {
     font-size: 1.1rem;
     font-weight: 600;
-    color: var(--vms-gray-dark);
+    color: var(--vms-white);
 }
 
 .status-badge {
@@ -258,22 +252,22 @@ body {
 }
 
 .status-badge.active {
-    background: rgba(16, 185, 129, 0.1);
-    color: var(--vms-success);
-    border: 1px solid rgba(16, 185, 129, 0.2);
+    background: rgba(0, 230, 118, 0.1);
+    color: var(--vms-green);
+    border: 1px solid rgba(0, 230, 118, 0.2);
 }
 
 .status-badge.inactive {
-    background: rgba(239, 68, 68, 0.1);
-    color: var(--vms-error);
-    border: 1px solid rgba(239, 68, 68, 0.2);
+    background: rgba(128, 128, 128, 0.1);
+    color: var(--vms-gray);
+    border: 1px solid rgba(128, 128, 128, 0.2);
 }
 
 .stream-preview {
     width: 100%;
-    height: 200px;
-    background: linear-gradient(135deg, var(--vms-gray-light), var(--vms-border));
-    border-radius: 8px;
+    aspect-ratio: 1 / 1; /* perfect square */
+    background: var(--vms-black);
+    border-radius: 6px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -282,16 +276,15 @@ body {
     overflow: hidden;
     cursor: pointer;
     transition: all 0.3s ease;
+    border: 2px solid var(--vms-gray-mid);
 }
 
 .stream-preview.active {
-    background: linear-gradient(135deg, rgba(16, 185, 129, 0.1), rgba(16, 185, 129, 0.05));
-    border: 2px solid rgba(16, 185, 129, 0.2);
+    border-color: var(--vms-green);
 }
 
 .stream-preview.inactive {
-    background: linear-gradient(135deg, rgba(239, 68, 68, 0.1), rgba(239, 68, 68, 0.05));
-    border: 2px solid rgba(239, 68, 68, 0.2);
+    border-color: var(--vms-gray-mid);
 }
 
 .stream-preview:hover {
@@ -305,7 +298,7 @@ body {
 }
 
 .stream-preview.active i {
-    color: var(--vms-success);
+    color: var(--vms-green);
 }
 
 .stream-preview.inactive i {
@@ -318,7 +311,7 @@ body {
     left: 50%;
     transform: translateX(-50%);
     background: rgba(0, 0, 0, 0.8);
-    color: white;
+    color: var(--vms-white);
     padding: 0.5rem 1rem;
     border-radius: 6px;
     font-size: 0.8rem;
@@ -352,7 +345,7 @@ body {
 }
 
 .info-value {
-    color: var(--vms-gray-dark);
+    color: var(--vms-white);
     font-weight: 600;
 }
 
@@ -377,12 +370,11 @@ body {
     top: 0;
     width: 100%;
     height: 100%;
-    background-color: rgba(0, 0, 0, 0.5);
-    backdrop-filter: blur(4px);
+    background-color: rgba(0, 0, 0, 0.7);
 }
 
 .modal-content {
-    background: var(--vms-white);
+    background: var(--vms-gray-dark);
     margin: 5% auto;
     padding: 0;
     border-radius: 12px;
@@ -412,7 +404,7 @@ body {
 }
 
 .modal-header h2 {
-    color: var(--vms-gray-dark);
+    color: var(--vms-white);
     font-size: 1.25rem;
     font-weight: 600;
 }
@@ -432,8 +424,8 @@ body {
 }
 
 .close:hover {
-    color: var(--vms-error);
-    background: rgba(239, 68, 68, 0.1);
+    color: var(--vms-green);
+    background: rgba(0, 230, 118, 0.1);
 }
 
 .modal-body {
@@ -469,7 +461,8 @@ body {
     border-radius: 6px;
     font-family: 'Monaco', 'Menlo', monospace;
     font-size: 0.8rem;
-    background: var(--vms-gray-light);
+    background: var(--vms-black);
+    color: var(--vms-white);
 }
 
 .modal-actions {
