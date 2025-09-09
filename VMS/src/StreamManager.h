@@ -5,7 +5,6 @@
 #include <mutex>
 #include <atomic>
 #include "GStreamerPipeline.h"
-#include "PassiveStreamMonitor.h"
 
 class StreamManager {
 public:
@@ -22,7 +21,6 @@ public:
     
 private:
     std::map<int, std::unique_ptr<GStreamerPipeline>> m_streams;
-    std::map<int, std::unique_ptr<PassiveStreamMonitor>> m_monitors;
     std::mutex m_streamsMutex;
     std::atomic<int> m_nextPort;
     

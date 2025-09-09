@@ -33,7 +33,6 @@ set(SOURCES
     src/StreamManager.cpp
     src/GStreamerPipeline.cpp
     src/WebSocketHandler.cpp
-    src/PassiveStreamMonitor.cpp
 )
 
 # Create executable
